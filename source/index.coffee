@@ -1,92 +1,68 @@
 configure = ($ = {}) ->
   $.Core ?= require("boco-mdd-jasmine-core").configure($)
-  $.CoffeeScript ?= require("coffee-script")
   $.reduceUnique ?= (vals, val) -> vals.push(val) unless val in vals; vals
 
-  class CoffeeToken
-    type: null
-    value: null
-    variable: null
-    firstLine: null
-    firstColumn: null
-    lastLine: null
-    lastColumn: null
-
-    constructor: (props = {}) ->
-      @[key] = val for own key, val of props
-
-    @isVariable: (token) ->
-      token.type is "IDENTIFIER" and token.variable
-
-    @getValue: (token) ->
-      token.value
-
-    @convert: (csToken) ->
-      [type, value, {first_line, first_column, last_line, last_column}] = csToken
-      new CoffeeToken
-        type: type, value: value, variable: csToken.variable,
-        firstLine: first_line, firstColumn: first_column,
-        lastLine: last_line, lastColumn: last_column
-
-  class CoffeeScriptService extends $.Core.ScriptService
-    tokenize: (code) ->
-      $.CoffeeScript.tokens(code).map CoffeeToken.convert
-
+  class JavascriptService extends $.Core.ScriptService
     getVariableNames: (code) ->
-      tokens = @tokenize(code).filter CoffeeToken.isVariable
-      names = tokens.map CoffeeToken.getValue
-      names.reduce $.reduceUnique, []
+      pattern = /var ([$\w]+)/gm
+      match[1] while match = pattern.exec(code)
 
-  class CoffeeSnippetsRenderer extends $.Core.SnippetsRenderer
+  class JavascriptSnippetsRenderer extends $.Core.SnippetsRenderer
 
     renderInitializeFilesVariable: ({variableName}) ->
-      "#{variableName} = {}"
+      "var #{variableName} = {};"
 
     renderDescribeStart: ({text}) ->
-      "describe #{JSON.stringify(text)}, ->"
+      "describe(#{JSON.stringify(text)}, function() {"
 
     renderInitializeVariables: ({variableNames}) ->
-      "[#{variableNames.join(', ')}] = []"
+      "var #{variableNames.join(', ')};"
 
     renderBeforeEachStart: ->
-      "beforeEach ->"
+      "beforeEach(function() {"
 
     renderAssignFile: ({variableName, path, data}) ->
-      "#{variableName}[#{JSON.stringify(path)}] = #{JSON.stringify(data)}"
+      "#{variableName}[#{JSON.stringify(path)}] = #{JSON.stringify(data)};"
 
     renderBeforeEachCode: ({code}) ->
       code
 
     renderAfterEachStart: ->
-      "afterEach ->"
+      "afterEach(function() {"
 
     renderDeleteFile: ({variableName, path}) ->
-      "delete #{variableName}[#{JSON.stringify(path)}]"
+      "delete #{variableName}[#{JSON.stringify(path)}];"
 
     renderAssertionStart: ({text, isAsync, doneFunctionName}) ->
-      fnArgsStr = if isAsync then "(#{doneFunctionName}) " else ""
-      "it #{JSON.stringify(text)}, #{fnArgsStr}->"
+      fnArgsStr = if isAsync then doneFunctionName else ""
+      "it(#{JSON.stringify(text)}, function(#{fnArgsStr}) {"
 
     renderAssertionCode: ({code}) ->
       code
 
-    renderAssertionEnd: -> null
-    renderAfterEachEnd: -> null
-    renderBeforeEachEnd: -> null
-    renderDescribeEnd: -> null
+    renderAssertionEnd: ->
+      "});"
+
+    renderAfterEachEnd: ->
+      "});"
+
+    renderBeforeEachEnd: ->
+      "});"
+
+    renderDescribeEnd: ->
+      "});"
 
   class Generator extends $.Core.Generator
     constructor: (props = {}) ->
       super props
-      @scriptService ?= new CoffeeScriptService
-      @snippetsRenderer ?= new CoffeeSnippetsRenderer
+      @scriptService ?= new JavascriptService
+      @snippetsRenderer ?= new JavascriptSnippetsRenderer
 
   JasmineCoffee =
     configuration: $
     configure: configure
-    CoffeeToken: CoffeeToken
-    CoffeeScriptService: CoffeeScriptService
-    CoffeeSnippetsRenderer: CoffeeSnippetsRenderer
+    JavascriptService: JavascriptService
+    JavascriptSnippetsRenderer: JavascriptSnippetsRenderer
     Generator: Generator
 
 module.exports = configure()

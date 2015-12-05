@@ -32,7 +32,7 @@ build-specs() {
 build() {
   build-source
   build-readme
-  build-specs
+  # build-specs
 }
 
 argv=("$*")
