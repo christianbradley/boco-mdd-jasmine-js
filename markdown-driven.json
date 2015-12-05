@@ -1,0 +1,11 @@
+{ 
+  "generator": "boco-mdd-jasmine-js",
+  "parserOptions": {
+    "nativeLanguages": ["js", "javascript"]
+  },
+  "converterOptions": {
+    "readDir": "docs",
+    "writeDir": "spec",
+    "writeExt": ".spec.js"
+  }
+}

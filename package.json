@@ -1,0 +1,37 @@
+{
+  "name": "boco-mdd-jasmine-js",
+  "version": "0.0.1",
+  "description": "Jasmine + JavaScript Generator for boco-markdown-driven",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "./npm/test",
+    "preversion": "./npm/run clean build && ./npm/test",
+    "build": "./npm/run clean build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/christianbradley/boco-mdd-jasmine-js.git"
+  },
+  "keywords": [
+    "mdd",
+    "markdown-driven",
+    "markdown",
+    "javascript",
+    "test",
+    "spec"
+  ],
+  "author": "Christian Bradley <christianbradley@gmail.com> (https://github.com/christianbradley)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/christianbradley/boco-mdd-jasmine-js/issues"
+  },
+  "homepage": "https://github.com/christianbradley/boco-mdd-jasmine-js#readme",
+  "devDependencies": {
+    "boco-markdown-driven": "^0.3.6",
+    "coffee-script": "^1.10.0",
+    "jasmine": "^2.4.1"
+  },
+  "dependencies": {
+    "boco-mdd-jasmine-core": "^0.2.3"
+  }
+}
